@@ -5,6 +5,7 @@ import { LatLng } from './types/common/latlng.interface';
 import { CircleOptions } from './types/shapes/circle.interface';
 import { PolygonOptions } from './types/shapes/polygon.interface';
 import { PolylineOptions } from './types/shapes/polyline.interface';
+import { Hue } from "./types/common/hue.enum";
 
 export class CapacitorGoogleMapsWeb extends WebPlugin implements CapacitorGoogleMapsPlugin {
   constructor() {
@@ -20,7 +21,7 @@ export class CapacitorGoogleMapsWeb extends WebPlugin implements CapacitorGoogle
   initialize(_options: { key: string }): Promise<any> {
     throw new Error('Method not implemented.');
   }
-  addMarker(_options: { latitude: number; longitude: number; opacity?: number; title?: string; snippet?: string; isFlat?: boolean; url?: string }): Promise<any> {
+  addMarker(_options: { latitude: number; longitude: number; opacity?: number; title?: string; snippet?: string; isFlat?: boolean; url?: string, metadata?: object, hue?: Hue, showIcon?: boolean }): Promise<any> {
     throw new Error('Method not implemented.');
   }
   removeMarker(_options: { id: number; }): Promise<any> {

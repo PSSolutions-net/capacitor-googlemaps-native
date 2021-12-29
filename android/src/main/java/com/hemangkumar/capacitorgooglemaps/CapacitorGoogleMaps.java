@@ -5,6 +5,9 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.content.res.AssetManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
@@ -31,6 +34,7 @@ import com.google.android.libraries.maps.GoogleMapOptions;
 import com.google.android.libraries.maps.MapView;
 import com.google.android.libraries.maps.OnMapReadyCallback;
 import com.google.android.libraries.maps.UiSettings;
+import com.google.android.libraries.maps.model.BitmapDescriptorFactory;
 import com.google.android.libraries.maps.model.CameraPosition;
 import com.google.android.libraries.maps.model.CircleOptions;
 import com.google.android.libraries.maps.model.LatLng;
@@ -40,11 +44,13 @@ import com.google.android.libraries.maps.model.MarkerOptions;
 import com.google.android.libraries.maps.model.PointOfInterest;
 import com.google.android.libraries.maps.model.PolygonOptions;
 import com.google.android.libraries.maps.model.PolylineOptions;
+import com.hemangkumar.capacitorgooglemaps.capacitorgooglemaps.R;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.List;
 
@@ -72,6 +78,9 @@ public class CapacitorGoogleMaps extends Plugin implements OnMapReadyCallback, G
     @Override
     public void onMapReady(GoogleMap googleMap) {
         this.googleMap = googleMap;
+        this.googleMap.setMapStyle(
+                MapStyleOptions.loadRawResourceStyle(
+                        getContext(), R.raw.map_style));
         notifyListeners("onMapReady", null);
     }
 
@@ -150,6 +159,9 @@ public class CapacitorGoogleMaps extends Plugin implements OnMapReadyCallback, G
                 googleMapOptions.camera(cameraPosition);
                 googleMapOptions.liteMode(liteMode);
 
+                // Remove Maps buttons at bottom-right
+                // googleMapOptions.mapToolbarEnabled(false);
+
                 if (mapViewParentId != null){
                     View viewToRemove = ((ViewGroup) getBridge().getWebView().getParent()).findViewById(mapViewParentId);
                     if (viewToRemove != null){
@@ -191,6 +203,9 @@ public class CapacitorGoogleMaps extends Plugin implements OnMapReadyCallback, G
         final Boolean isFlat = call.getBoolean("isFlat", true);
         final JSObject metadata = call.getObject("metadata");
 
+        final Float hue = call.getFloat("hue", null);
+        final Boolean showIcon = call.getBoolean("showIcon", false);
+
         if (googleMap == null){
             call.reject("Map is not ready");
             return;
@@ -206,6 +221,24 @@ public class CapacitorGoogleMaps extends Plugin implements OnMapReadyCallback, G
                 markerOptions.title(title);
                 markerOptions.snippet(snippet);
                 markerOptions.flat(isFlat);
+
+                if (hue != null) {
+                    markerOptions.icon(BitmapDescriptorFactory.defaultMarker(hue));
+                }
+
+                if (showIcon) {
+                    Bitmap icon = null;
+
+                    try {
+                        AssetManager mngr = getContext().getAssets();
+                        InputStream BulletImgInput = mngr.open("public/assets/car_transparent_small.bmp");
+                        icon = BitmapFactory.decodeStream(BulletImgInput);
+                    } catch (Exception ex) {
+                        System.out.println(ex.getMessage());
+                    }
+
+                    markerOptions.icon(BitmapDescriptorFactory.fromBitmap(icon));
+                }
 
                 Marker marker = googleMap.addMarker(markerOptions);
 
@@ -571,7 +604,7 @@ public class CapacitorGoogleMaps extends Plugin implements OnMapReadyCallback, G
     }
 
     @PluginMethod()
-    public void setCamera(PluginCall call) {
+    public void setCamera(final PluginCall call) {
 
 
 

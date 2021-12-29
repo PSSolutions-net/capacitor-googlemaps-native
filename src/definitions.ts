@@ -4,6 +4,7 @@ import { LatLng } from './types/common/latlng.interface';
 import { PolylineOptions } from './types/shapes/polyline.interface';
 import { PolygonOptions } from './types/shapes/polygon.interface';
 import { CircleOptions } from './types/shapes/circle.interface';
+import { Hue } from "./types/common/hue.enum";
 
 export interface CapacitorGoogleMapsPlugin {
   /** Creates map view and displays it */
@@ -30,6 +31,9 @@ export interface CapacitorGoogleMapsPlugin {
     snippet?: string;
     isFlat?: boolean;
     url?: string;
+    metadata?: object;
+    hue?: Hue;
+    showIcon?: boolean;
   }): Promise<any>;
 
   /** Removes a marker on the map */
