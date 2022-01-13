@@ -65,7 +65,11 @@ public class CapacitorGoogleMaps: CAPPlugin, GMSMapViewDelegate, GMSPanoramaView
         let snippet = call.getString("snippet") ?? ""
         let isFlat = call.getBool("isFlat") ?? false
         let metadata = call.getObject("metadata") ?? [:]
-        let url = URL(string: call.getString("iconUrl", ""))
+        let url = URL(string: call.getString("icon", ""))
+        
+        let hue = call.getFloat("hue", -1);
+        let showIcon = call.getBool("showIcon", false);
+        
         var imageData: Data?
 
         if self.mapViewController == nil {
@@ -90,6 +94,48 @@ public class CapacitorGoogleMaps: CAPPlugin, GMSMapViewDelegate, GMSPanoramaView
 
                 if imageData != nil {
                     marker.icon = UIImage(data: imageData!)
+                }
+                
+                if (hue != -1) {
+                    var color = UIColor.black;
+                    
+                    switch (hue) {
+                        case 240:
+                            color = UIColor.blue;
+                            break;
+                        case 180:
+                            color = UIColor.cyan;
+                            break;
+                        case 120:
+                            color = UIColor.green;
+                            break;
+                        case 300:
+                            color = UIColor.magenta;
+                            break;
+                        case 30:
+                            color = UIColor.orange;
+                            break;
+                        case 0:
+                            color = UIColor.red;
+                            break;
+                        case 270:
+                            color = UIColor.purple;
+                            break;
+                        case 60:
+                            color = UIColor.yellow;
+                            break;
+                        default:
+                            break;
+                    }
+                    
+                    marker.icon = GMSMarker.markerImage(with: color);
+                }
+                
+                if (showIcon) {
+                    marker.icon = UIImage(data: imageData!)
+                    let urlPath = Bundle.main.url(forResource: "car_transparent_small", withExtension: "bmp");
+                    let iconData = try? Data(contentsOf: urlPath!);
+                    marker.icon = UIImage(data: iconData!);
                 }
 
                 marker.map = self.mapViewController.GMapView
